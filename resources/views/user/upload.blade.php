@@ -24,7 +24,7 @@
 
                 </div>
 		
-                <label for="sel1">Select image to upload:</label>
+                <label for="sel1">Select file to upload:</label>
                 <input type="file" name="file" id="file">
                 <!-- drop down category -->
                 <label for="sel1">Select category:</label>
@@ -38,11 +38,14 @@
                                     
                 {{ csrf_field() }}
 
+            {{ Form::button('<i class="fa fa-upload"></i> Upload', array(
+                   'type' => 'submit',
+                   'id' => 'upload',
+                   ))
+                }}
 
         <br><small>File Extensions :[{{ \App\UploadSetting::find(1)->allowedFilesExt }}] </small>
           </div>
-            
-                <input id="pdffile" style="visibility;" name="zfile" type="file" />
           
           
         </div> <!-- /# END panel default -->
@@ -54,10 +57,7 @@
 </div> 
 <script language="javascript">
  $(document).ready(function() {
-    $("#btn_change").click(function() {
-          $("#regTitle").html("Text After clicking on button");
-    });
-
+    
   $('#upload').click (function() {
     console.log('click');
     var file_data = $('#file').prop('files')[0];   

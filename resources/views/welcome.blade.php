@@ -12,10 +12,10 @@
                 <div class="panel-heading">Welcome</div>
 
                 <div class="panel-body">
-                               Hello world!
-                </div>
-            </div>
-        </div>
-    </div>
+                 Hello world!
+             </div>
+         </div>
+     </div>
+ </div>
 </div>
 @endsection

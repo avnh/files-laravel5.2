@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Laravel</title>
+    <title>Files</title>
 
     <!-- Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
@@ -49,7 +49,7 @@
 
                 <!-- Branding Image -->
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    Laravel
+                    Files
                 </a>
             </div>
 
@@ -76,7 +76,7 @@
                             </a>
 
                             <ul class="dropdown-menu" role="menu">
-                                @if (Auth::user()->level == 0)
+                                @if (Auth::user()->level == '1')
                                     <li><a href="{{ url('admin/dashboard') }}"><i class="fa fa-fw fa-tasks"></i>Admin panel</a></li>
                                 @endif
                                 <li><a href="{{ url('user/'.Auth::user()->username.'/setting') }}"><i class="fa fa-fw fa-gear"></i>Setting</a></li>

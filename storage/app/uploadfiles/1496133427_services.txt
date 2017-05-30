@@ -1,0 +1,5 @@
+getsessiontoken
+getfilelist
+dowloadfile
+uploadfile
+getstatistics

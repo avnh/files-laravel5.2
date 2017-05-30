@@ -38,9 +38,7 @@
                         <i class="fa fa-crosshairs"></i> Size
                     </th>
                     <th class=" hidden-xs" data-search="false" data-field="uploadAt"><i class="fa fa-clock-o"></i> Upload time</th>
-                    <th class=" hidden-xs" title="File Status" data-search="false" data-field="status">
-                        <i class="fa fa-globe"></i>
-                    </th>
+                    
                     <th class=" hidden-xs" data-search="false" data-field="downloadCounter">
                       <i class="fa fa-cloud-download"></i> 
                     </th>
@@ -89,13 +87,7 @@
                         <td lass=" hidden-xs" data-field="uploadAt">
                           {{ $file->created_at->diffForHumans() }}
                         </td>
-                        <td lass=" hidden-xs" data-field="status">
-                          @if ($file->fileStatus == 1 )
-                          <i class="fa fa-check"></i>
-                          @else
-                          <i class="fa fa-times"></i> 
-                          @endif
-                        </td>                   
+                                        
                         <td lass=" hidden-xs" data-field="downloadCounter">
                             {{ $file->fileDownloadCounter }}
                         </td>
@@ -293,7 +285,9 @@ $(document).ready(function(){
                             "_token": "{{ csrf_token() }}"
                         },
                         success: function (response) {
-                            if (response == "ok") {
+                            var str = response;
+                            console.log(typeof str);
+                            if (str.indexOf("ock-ok")) {
                                 if($('#lock-' + eid + ' i').hasClass('fa fa-unlock') && btn.val != ''){
                                     $('#lock-' + eid + ' i')
                                         .removeClass('fa fa-unlock').addClass('fa fa-lock')

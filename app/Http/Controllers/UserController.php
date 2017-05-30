@@ -27,7 +27,7 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-   
+        
     }
 
     /**
@@ -45,12 +45,12 @@ class UserController extends Controller
         }   
     }
     /**
-     * Get user  info
+     * Get user::dashboard  info
      *
      * @return void
      **/
     public function getUserInfo() {
-                        
+        
         ## Get User Personal Info
         $this->userInfo  = User::where('username', '=', $this->urlUsername)->first();
         if(!$this->userInfo ){
@@ -73,8 +73,13 @@ class UserController extends Controller
         ## Get Categories Info
         $this->categories = Category::all();
 
-        ## Function To Handle Files Size
+        $userDiskSpace = UploadSetting::find(1)->userDiskSpace;
         
+        $this->userAvailableDiskSpace = $userDiskSpace - $this->totalFilesSize;
+        
+        
+
+        ## Function To Handle Files Size
         function size ( $type, $sub = null ){
             if($sub === null){
                 $si_prefix = array( 'B', 'KB', 'MB', 'GB', 'TB', 'EB', 'ZB', 'YB' );
@@ -82,7 +87,7 @@ class UserController extends Controller
                 $class = min((int)log($type , $base) , count($si_prefix) - 1);
 
                 return @$disk_free_space = sprintf('%1.2f' ,
-                $type / pow($base,$class)) . ' ' .      $si_prefix[$class] ;
+                    $type / pow($base,$class)) . ' ' .      $si_prefix[$class] ;
             }
         }
         
@@ -90,15 +95,15 @@ class UserController extends Controller
             $number=$from;
             switch($return){
                 case "MB":
-                    return round($number/pow(1024,2),2);
+                return round($number/pow(1024,2),2);
                 case "GB":
-                    return $number/pow(1024,3);
+                return $number/pow(1024,3);
                 case "TB":
-                    return $number/pow(1024,4);
+                return $number/pow(1024,4);
                 case "PB":
-                    return $number/pow(1024,5);
+                return $number/pow(1024,5);
                 default:
-                    return $from;
+                return $from;
             }
         }
         
@@ -110,7 +115,7 @@ class UserController extends Controller
      * @return void
      **/
     public function getHomeInfo() {
-    
+        
         ## Get User Personal Info
         $this->userInfo  = User::where('username', '=', $this->urlUsername)->first();
         if(!$this->userInfo ){
@@ -135,7 +140,7 @@ class UserController extends Controller
                 $class = min((int)log($type , $base) , count($si_prefix) - 1);
 
                 return @$disk_free_space = sprintf('%1.2f' ,
-                $type / pow($base,$class)) . ' ' .      $si_prefix[$class] ;
+                    $type / pow($base,$class)) . ' ' .      $si_prefix[$class] ;
             }
         }
         
@@ -143,15 +148,15 @@ class UserController extends Controller
             $number=$from;
             switch($return){
                 case "MB":
-                    return round($number/pow(1024,2),2);
+                return round($number/pow(1024,2),2);
                 case "GB":
-                    return $number/pow(1024,3);
+                return $number/pow(1024,3);
                 case "TB":
-                    return $number/pow(1024,4);
+                return $number/pow(1024,4);
                 case "PB":
-                    return $number/pow(1024,5);
+                return $number/pow(1024,5);
                 default:
-                    return $from;
+                return $from;
             }
         }
         
@@ -169,9 +174,7 @@ class UserController extends Controller
             return redirect("/");
         }
         $this->getHomeInfo();
-        $this->userFilesPaginate = File::where('fileStatus', '=', 1)
-            ->orderBy('id','desc')
-            ->paginate(20);
+        $this->userFilesPaginate = File::orderBy('id','desc')->paginate(20);
         // print_r($this->categories);
         $data = array(
             'title'            => 'Home',
@@ -181,7 +184,7 @@ class UserController extends Controller
             'isAdmin'          => $this->isAdmin,
             'categories'       => $this->categories,
             'userFiles'  =>   $this->userFilesPaginate,
-        );
+            );
         
         return view('home')->with('data',$data);
     }
@@ -197,12 +200,12 @@ class UserController extends Controller
             return redirect("/");
         }
         $this->getUserInfo();
-    	
-    	$this->userFilesPaginate = File::where('userID', '=', $this->userInfo['id'])
-            ->orderBy('id','desc')
-            ->paginate(20);
+        
+        $this->userFilesPaginate = File::where('userID', '=', $this->userInfo['id'])
+        ->orderBy('id','desc')
+        ->paginate(20);
         // print_r($this->userFilesPaginate);
-    	$data = array(
+        $data = array(
             'title'            => 'Dashboard',
             'nav'              => 'dashboard',
             'adminPreviewMode' =>  $this->adminPreviewMode,
@@ -211,10 +214,10 @@ class UserController extends Controller
             'categories'       => $this->categories,
             'totalFiles'       => count($this->userFiles),
             'totalFilesSize'   =>  size($this->totalFilesSize),
-            'totalFreeDiskSpace'   => '12345',
+            'totalFreeDiskSpace'   => size($this->userAvailableDiskSpace),
             'userFiles'  =>   $this->userFilesPaginate,
             'totalDownloadedFiles' => DB::table('files')->where('userID', '=', $this->userInfo['id'])->sum('fileDownloadCounter'),
-        );
+            );
         return view('user.dashboard')->with('data',$data);
     }
 
@@ -228,14 +231,9 @@ class UserController extends Controller
             return redirect("/");
         }
         $this->getUserInfo();
-        // Check User Avilable Space 
-        $userFilesSize = $this->totalFilesSize;
-        $userDiskSpace = UploadSetting::find(1)->userDiskSpace;
-        
-        $userAvailableDiskSpace = $userDiskSpace - $userFilesSize;
-        
-        if($userAvailableDiskSpace < UploadSetting::find(1)->maxFileSize){
-            $MaxUploadSize = $userAvailableDiskSpace;
+        //get Maxuplaod siex
+        if($this->userAvailableDiskSpace < UploadSetting::find(1)->maxFileSize){
+            $MaxUploadSize = $this->userAvailableDiskSpace;
         }else{
             $MaxUploadSize = UploadSetting::find(1)->maxFileSize;
         }
@@ -253,7 +251,7 @@ class UserController extends Controller
             'userFiles'        =>$this->userFiles,
             'MaxUploadSize' => convertFromBytes($MaxUploadSize,'MB')
 
-        );
+            );
         
         return view('user.upload')->with('data',$data);
     }
@@ -264,7 +262,7 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function postUpload($username) {
+     public function postUpload($username) {
         if (!$this->checkUsername($username)) {
             return redirect("/");
         }
@@ -291,15 +289,15 @@ class UserController extends Controller
         $validator = Validator::make(
             array('file' => $file),
             array('file' => 'required|max:'.( $uploadSetting->maxFileSize)  )
-        );
+            );
         
         if ($validator->fails()){
             # If File Size Not Allowed Return Error
-            return Response::json('File Size Large', 400);
-        
+            return Response::json('File Size Large', 200);
+            
         } else if ( !in_array(strtolower($fileExt),$allowedExt) ){
             # If File Ext Not Allowed Return Error
-            return Response::json('This file Type is Not Supported', 400);
+            return Response::json('This file Type is Not Supported', 200);
             
         } else {
             # Init File To Upload
@@ -329,7 +327,7 @@ class UserController extends Controller
                 $upload_success = Storage::put(
                     $destinationPath.$filename, 
                     file_get_contents($file->getRealPath())
-                );
+                    );
                 # If file Uploaded Success
                 
                 if ($upload_success) {
@@ -357,8 +355,7 @@ class UserController extends Controller
                         $files->UserID = 0;
                         $files->fileDesc = 'null';
                     }
-                    # User Ip
-                    $files->userIp = Request::getClientIp(true);
+                    
                     
                     # File Status
                     $files->fileStatus = 1;
@@ -375,10 +372,10 @@ class UserController extends Controller
 
                 } else {
                     
-                    return Response::json('Cant Upload This File ', 400);
+                    return Response::json('Cant Upload This File ', 200);
                 }
             }
-                
+            
         }
     }
 
@@ -396,7 +393,7 @@ class UserController extends Controller
             'isAdmin'          => $this->isAdmin,
             'userInfo'         => $this->userInfo,
             
-        );
+            );
         
         
         return view('user.setting')->with('data',$data);
@@ -436,8 +433,8 @@ class UserController extends Controller
         if( $validator->fails() ){
             
             return redirect()->back()
-                    ->withInput($inputs)
-                    ->withErrors($validator);
+            ->withInput($inputs)
+            ->withErrors($validator);
         }else {
             
             $user = User::find(Auth::user()->id);
@@ -451,23 +448,23 @@ class UserController extends Controller
 
             if( $user->save() ){
                 Session::flash('Message','
-                <div id="message-alert" class="alert alert-success alert-dismissible" role="alert">
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                  <span aria-hidden="true">&times;</span></button>
-                  <strong>Well!</strong> 
-                  Your Action has been Successfully Updated.
-                </div>
-                ');
+                    <div id="message-alert" class="alert alert-success alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                    <strong>Well!</strong> 
+                    Your Action has been Successfully Updated.
+                    </div>
+                    ');
                 
                 return Redirect::intended('user/'.strtolower($inputs['username']).'/setting');
 
-                }else{
+            }else{
 
-                    return Redirect::to('user/'.strtolower($inputs['username']).'/setting')
-                            ->withInput()
-                            ->WithErrors(' Please check your entry and try again..');
-                }
+                return Redirect::to('user/'.strtolower($inputs['username']).'/setting')
+                ->withInput()
+                ->WithErrors(' Please check your entry and try again..');
             }
+        }
         
     }
 }

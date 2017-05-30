@@ -38,11 +38,11 @@
                 </li>
                 <br>
 
-              @if ($data['isLocked'])
+              @if ($data['isLocked'] == 0 )
                 {{ Form::open( array(
                     'role' => 'form',
                     'id' => 'downloadLocked',
-                    'url' =>  Request::path().'file/downloadLocked' 
+                    'url' =>  asset('file/downloadLocked/'.$data["fileId"]) 
                 ) ) }}
                  <label for="password"><i class="fa fa-lock"></i> File Password</label>
                 @if( Session::has('message') ?
@@ -59,7 +59,7 @@
                 {{ Form::open( array(
                     'role' => 'form',
                     'id' => 'download',
-                    'url' => $data['fileDownloadPath']
+                    'url' => asset('file/download/'.$data["fileId"])
                 )) }}
 
                 @endif

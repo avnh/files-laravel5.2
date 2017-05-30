@@ -20,8 +20,13 @@ Route::get('/test', function () {
 	// echo Storage::disk('local')->exists('uploadfile/file.txt');
 	// echo file_get_contents(storage_path().'\app\uploadfiles\1495479621_2014_04_msw_a4_format.doc');
 	// $file = Storage::disk('local')->get('uploadfiles/1495479621_2014_04_msw_a4_format.doc');
- 	echo Storage::delete("/uploadfile/file.txt");
-	
+	// return response()->download("../storage/app/uploadfile/file.txt");
+	print_r(DB::table('uploadsettings')->insert([
+            'id' => 1,
+            'allowedFilesExt' => 'txt',
+            'maxFileSize' => 16,
+            'userDiskSpace' => 128,
+        ]));
     // return view('user.file');
 });
 
@@ -39,14 +44,18 @@ Route::post('user/{username}/setting', 'UserController@changeSetting');
 
 Route::get('file/show/{fileid}', 'FileController@showFile');
 Route::post('file/download/{fileid}', 'FileController@downloadFile');
+Route::post('file/downloadLocked/{fileid}', 'FileController@downloadLockedFile');
 Route::post('file/delete', 'FileController@deleteFile');
-Route::get('file/lock', 'FileController@lockFile');
 Route::post('file/lock', 'FileController@lockFile');
 
 Route::get('admin/dashboard', 'AdminController@dashboard');
 Route::get('admin/upload', 'AdminController@upload');
 Route::post('admin/upload', 'AdminController@saveUploadSettings');
 Route::get('admin/user', 'AdminController@user');
-Route::post('admin/user', 'AdminController@user');
 Route::get('admin/user/delete/{id}', 'AdminController@deleteUser');
+Route::get('admin/file', 'AdminController@file');
+Route::post('admin/file/{fileid}', 'AdminController@deleteFile');
+Route::get('admin/category', 'AdminController@category');
+Route::post('admin/category/delete/{categoryid}', 'AdminController@deleteCategory');
+Route::post('admin/category/', 'AdminController@updateCategory');
 

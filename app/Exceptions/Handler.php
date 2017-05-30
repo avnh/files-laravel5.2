@@ -17,10 +17,10 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
-        AuthorizationException::class,
-        HttpException::class,
-        ModelNotFoundException::class,
-        ValidationException::class,
+    AuthorizationException::class,
+    HttpException::class,
+    ModelNotFoundException::class,
+    ValidationException::class,
     ];
 
     /**
@@ -43,17 +43,17 @@ class Handler extends ExceptionHandler
      * @param  \Exception  $e
      * @return \Illuminate\Http\Response
      */
-    // public function render($request, Exception $e)
-    // {
-    //     return parent::render($request, $e);
-    // }
+    public function render1($request, Exception $e)
+    {
+        return parent::render($request, $e);
+    }
     public function render($request, Exception $e)
     {
 
         
         // this line allows you to redirect to a route or even back to the current page if there is a CSRF Token Mismatch
-        if($e instanceof TokenMismatchException){
-            return redirect()->route('/');
+        if($e instanceof \Illuminate\Session\TokenMismatchException){
+            return \Response::view('errors.500',array(),500);
         }       
 
         // let's add some support if a Model is not found 
@@ -66,28 +66,29 @@ class Handler extends ExceptionHandler
         if($e instanceof \Symfony\Component\Debug\Exception\FatalErrorException) {
             return \Response::view('errors.500',array(),500);
         }
-       
+        
         // finally we are back to the original default error handling provided by Laravel
         if($this->isHttpException($e))
         {
             switch ($e->getStatusCode()) {
                 // internal error
                 case 500:
-                    return \Response::view('errors.500',array(),500); 
+                return \Response::view('errors.500',array(),500); 
                     // internal error
                 case 503:
-                    return \Response::view('errors.503',array(),503);  
+                return \Response::view('errors.503',array(),503);  
                 break;
- 
+                
                 default:
                     // not found
-                    return \Response::view('errors.404',array(),404);
+                return \Response::view('errors.404',array(),404);
                 break;
             }
         }
         else
         {
-            return parent::render($request, $e);
+            return \Response::view('errors.500',array(),500);
+            // return parent::render($request, $e);
         }       
         
     }
